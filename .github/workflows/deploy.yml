@@ -29,10 +29,19 @@ jobs:
       with:
         ssh-private-key: ${{ secrets.DEPLOY_SSH_KEY }}
 
-    - name: Transfer executable to VPS
+    - name: Transfer executable to VPS1
       run: |
         scp -o StrictHostKeyChecking=no target/release/naive_serve ${{ secrets.DEPLOY_SSH_USER }}@${{ secrets.VPS1_HOST }}:/var/www/naive_serve/
 
-    - name: Restart the service
+    - name: Restart the service on VPS1
       run: |
         ssh -o StrictHostKeyChecking=no ${{ secrets.DEPLOY_SSH_USER }}@${{ secrets.VPS1_HOST }} 'sudo systemctl restart naive_serve'
+
+    - name: Transfer executable to VPS2
+      run: |
+        scp -o StrictHostKeyChecking=no target/release/naive_serve ${{ secrets.DEPLOY_SSH_USER }}@${{ secrets.VPS2_HOST }}:/var/www/naive_serve/
+
+    - name: Restart the service on VPS2
+      run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.DEPLOY_SSH_USER }}@${{ secrets.VPS2_HOST }} 'sudo systemctl restart naive_serve'
+  
