@@ -1,6 +1,7 @@
 use std::io::{Read, Write};
 use std::net::{TcpListener, TcpStream};
 use std::thread;
+use std::env;
 
 fn handle_client(mut stream: TcpStream) {
     let mut buffer = [0; 1024];
@@ -25,8 +26,16 @@ fn handle_client(mut stream: TcpStream) {
 }
 
 fn main() {
-    let listener = TcpListener::bind("127.0.0.1:8080").unwrap();
-    println!("Serveur en écoute sur http://127.0.0.1:8080");
+    let args: Vec<String> = env::args().collect();
+    let port = if args.len() > 1 {
+        args[1].parse().unwrap_or(8080)
+    } else {
+        8080
+    };
+
+    let address = format!("127.0.0.1:{}", port);
+    let listener = TcpListener::bind(&address).unwrap();
+    println!("Serveur en écoute sur http://{}", address);
 
     for stream in listener.incoming() {
         match stream {

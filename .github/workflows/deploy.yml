@@ -1,0 +1,38 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - main  # Déployer uniquement lorsque des changements sont poussés vers la branche main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Install Rust
+      run: |
+        sudo apt update
+        sudo apt install -y curl
+        curl https://sh.rustup.rs -sSf | sh -s -- -y
+        source $HOME/.cargo/env
+
+    - name: Compile the project with Cargo
+      run: |
+        cargo build --release
+
+    - name: Setup SSH key
+      uses: webfactory/ssh-agent@v0.5.4
+      with:
+        ssh-private-key: ${{ secrets.DEPLOY_SSH_KEY }}
+
+    - name: Transfer executable to VPS
+      run: |
+        scp -o StrictHostKeyChecking=no target/release/naive_serve ${{ secrets.DEPLOY_SSH_USER }}@${{ secrets.VPS1_HOST }}:/var/www/naive_serve/
+
+    - name: Restart the service
+      run: |
+        ssh -o StrictHostKeyChecking=no ${{ secrets.DEPLOY_SSH_USER }}@${{ secrets.VPS1_HOST }} 'sudo systemctl restart naive_serve'
