@@ -8,6 +8,10 @@ fn handle_client(mut stream: TcpStream) {
     stream.read(&mut buffer).unwrap();
 
     let request = String::from_utf8_lossy(&buffer[..]);
+
+    let request_str = request.lines().collect::<Vec<_>>().join("\n");
+    println!("Received request: {}", request_str);
+
     let response = match request.lines().next().unwrap() {
         "GET / HTTP/1.1" => "HTTP/1.1 200 OK\r\n\r\nHello2\n",
         "GET /crash HTTP/1.1" => "HTTP/1.1 200 OK\r\n\r\nCrash",      
