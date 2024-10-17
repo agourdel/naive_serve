@@ -13,7 +13,7 @@ fn handle_client(mut stream: TcpStream) {
         "GET /crash HTTP/1.1" => "HTTP/1.1 200 OK\r\n\r\nCrash",      
         _ => "HTTP/1.1 404 NOT FOUND\r\n\r\n",
     };
-
+    println!("{}", response);
     stream.write(response.as_bytes()).unwrap();
     stream.flush().unwrap();
 
