@@ -11,7 +11,7 @@ fn handle_client(mut stream: TcpStream) {
     let response = match request.lines().next().unwrap() {
         "GET / HTTP/1.1" => "HTTP/1.1 200 OK\r\n\r\nHello2\n",
         "GET /crash HTTP/1.1" => "HTTP/1.1 200 OK\r\n\r\nCrash",      
-        _ => "HTTP/1.1 404 NOT FOUND\r\n\r\n",
+        _ => "HTTP/1.1 200 OK\r\n\r\nNaive Serve",
     };
     println!("{}", response);
     stream.write(response.as_bytes()).unwrap();
