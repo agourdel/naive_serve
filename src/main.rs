@@ -9,15 +9,17 @@ fn handle_client(mut stream: TcpStream) {
 
     let request = String::from_utf8_lossy(&buffer[..]);
 
-    let request_str = request.lines().collect::<Vec<_>>().join("\n");
-    println!("Received request: {}", request_str);
+    let first_line = request.lines().next().unwrap_or("");
+    let mut parts = first_line.split_whitespace();
+    // let method = parts.next().unwrap_or("GET");
+    let path = parts.nth(1).unwrap_or("/");   
 
-    let response = match request.lines().next().unwrap() {
-        "GET / HTTP/1.1" => "HTTP/1.1 200 OK\r\n\r\nHello2\n",
-        "GET /crash HTTP/1.1" => "HTTP/1.1 200 OK\r\n\r\nCrash",      
-        _ => "HTTP/1.1 200 OK\r\n\r\nNaive Serve",
+    let response = match path {
+        "/" => "HTTP/1.1 200 OK\r\n\r\nHello2\n",
+        "/crash" => "HTTP/1.1 200 OK\r\n\r\nCrash",      
+        _ => "HTTP/1.1 404 NOT FOUND\r\n\r\n",
     };
-    println!("{}", response);
+   
     stream.write(response.as_bytes()).unwrap();
     stream.flush().unwrap();
 
